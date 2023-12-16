@@ -13,7 +13,7 @@ class CustomApp:
         self.create_widgets_background()
         self.create_widgets_buttons()
         self.create_widgets_entry()
-        #self.create_widgets_frames()
+        self.create_widgets_frames()
 
     def create_widgets_background(self):
         original_image = Image.open("Dashboard.png")
@@ -86,11 +86,10 @@ class CustomApp:
 
     #FRAMES HERE
     def create_widgets_frames(self):
-        self.FORM_1 = tk.Frame(self.master, bg="black")
-        self.FORM_1.place(x=29, y=185, width=300, height=185)
+        self.FORM_2 = tk.Frame(self.master, bg="#212121")
+        self.FORM_2.place(x=380, y=300, width=270, height=60)
 
-        self.FORM_2 = tk.Frame(self.master, bg="black")
-        self.FORM_2.place(x=358, y=185, width=300, height=185)
+       
 
 
 
