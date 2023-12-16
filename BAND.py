@@ -13,7 +13,7 @@ class CustomApp:
         self.create_widgets_background()
         self.create_widgets_buttons()
         self.create_widgets_entry()
-        self.create_widgets_frames()
+        #self.create_widgets_frames()
 
     def create_widgets_background(self):
         original_image = Image.open("Dashboard.png")
@@ -38,13 +38,50 @@ class CustomApp:
 
     def create_widgets_entry(self):
         default_value = "Search"
+        
 
-        self.SEARCH_ENTRY = Entry(self.canvas, width=22, font=('Arial', 11, "bold"), bg="#993333",fg="white")
+        self.SEARCH_ENTRY = Entry(self.canvas, width=16, font=('Arial', 14),bd=0, bg="#993333",fg="white")
         self.SEARCH_ENTRY.place(x=385, y=106)
 
         # Set default value
         self.SEARCH_ENTRY.insert(0, default_value)
         self.SEARCH_ENTRY.bind("<FocusIn>", self.clear_default_value)
+
+
+
+        #MEMBER_NAME ENTRY 
+        default_value_ENTRIES ="INPUT TEXT"
+        self.MEMBERNAME_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
+        self.MEMBERNAME_ENTRY.place(x=60, y=210)
+        self.MEMBERNAME_ENTRY.insert(0, default_value_ENTRIES)
+        self.MEMBERNAME_ENTRY.bind("<FocusIn>", self.clear_default_value)
+
+        #AGE
+        self.AGE_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
+        self.AGE_ENTRY.place(x=60, y=265)
+        self.AGE_ENTRY.insert(0, default_value_ENTRIES)
+        self.AGE_ENTRY.bind("<FocusIn>", self.clear_default_value)
+
+        #DEPARTMENT
+        self.DEPARTMENT_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
+        self.DEPARTMENT_ENTRY.place(x=60, y=320)
+        self.DEPARTMENT_ENTRY.insert(0, default_value_ENTRIES)
+        self.DEPARTMENT_ENTRY.bind("<FocusIn>", self.clear_default_value)
+
+        #BAND POSITION
+        self.POSITION_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
+        self.POSITION_ENTRY.place(x=395, y=210)
+        self.POSITION_ENTRY.insert(0, default_value_ENTRIES)
+        self.POSITION_ENTRY.bind("<FocusIn>", self.clear_default_value)
+
+        #ADDRESS
+        self.ADDRESS_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
+        self.ADDRESS_ENTRY.place(x=395, y=265)
+        self.ADDRESS_ENTRY.insert(0, default_value_ENTRIES)
+        self.ADDRESS_ENTRY.bind("<FocusIn>", self.clear_default_value)
+
+        #
+
 
 
     #FRAMES HERE
@@ -55,10 +92,21 @@ class CustomApp:
         self.FORM_2 = tk.Frame(self.master, bg="black")
         self.FORM_2.place(x=358, y=185, width=300, height=185)
 
+
+
     def clear_default_value(self, event):
         # Clear default value when the entry is clicked
         if self.SEARCH_ENTRY.get() == "Search":
             self.SEARCH_ENTRY.delete(0, tk.END)
+        if self.MEMBERNAME_ENTRY.get() and self.AGE_ENTRY.get() and self.DEPARTMENT_ENTRY.get() and self.POSITION_ENTRY.get() and self.ADDRESS_ENTRY.get() == "INPUT TEXT":
+            self.MEMBERNAME_ENTRY.delete(0,tk.END)
+            self.AGE_ENTRY.delete(0,tk.END)
+            self.DEPARTMENT_ENTRY.delete(0,tk.END)
+            self.POSITION_ENTRY.delete(0,tk.END)
+            self.ADDRESS_ENTRY.delete(0,tk.END)
+
+    
+
 
     def run(self):
         self.master.mainloop()
