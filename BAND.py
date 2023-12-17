@@ -121,7 +121,7 @@ class CustomApp:
             # Updated SELECT statement to join the members and instruments tables
             cursor.execute(
                 """
-                SELECT m.MemberID, m.MemberName, m.Gender, m.Department, m.UniformSize, m.Address, m.Age, i.Instrument
+                SELECT m.MemberID, m.MemberName, m.Gender, m.Department, m.UniformSize, m.Address, m.Age, i.Instrument, i.BandPosition
                 FROM members m
                 LEFT JOIN instruments i ON m.MemberID = i.MemberID
                 """
@@ -130,7 +130,7 @@ class CustomApp:
 
             conn.close()
 
-            columns = ("ID", "NAME", "GENDER", "DEPARTMENT", "UNIFORMSIZE", "ADDRESS", "AGE", "INSTRUMENTS")
+            columns = ("ID", "NAME","AGE", "GENDER", "DEPARTMENT", "UNIFORMSIZE", "ADDRESS", "INSTRUMENTS","POSITION")
             maroon_color = "#420303"
 
             # Create Style instance
@@ -139,11 +139,11 @@ class CustomApp:
 
             # Adjusted the x-coordinate of the Treeview widget
             self.treeview = ttk.Treeview(self.canvas, columns=columns, show="headings", height=9, style=f"{maroon_color}.Treeview")
-            self.treeview.place(x=30, y=390)
+            self.treeview.place(x=5, y=390)
 
              # Create a vertical scrollbar
             scrollbar = ttk.Scrollbar(self.canvas, orient="vertical", command=self.treeview.yview)
-            scrollbar.place(x=740, y=390, height=206)  # Adjust the x, y, and height as needed
+            scrollbar.place(x=777, y=390, height=206)  # Adjust the x, y, and height as needed
 
             # Configure the Treeview to use the scrollbar
             self.treeview.configure(yscrollcommand=scrollbar.set)
@@ -160,10 +160,12 @@ class CustomApp:
             for i, col in enumerate(columns):
                 # Manually set the width for the 'MemberName' column
                 if col == "NAME":
-                    self.treeview.column(col, width=max_widths[i] + 140, anchor="center")
+                    self.treeview.column(col, width=max_widths[i] + 100, anchor="center")
                 # Manually set the width for the 'Instrument' column
-                elif col == "INSTRUMENTS":
-                    self.treeview.column(col, width=max_widths[i] + 40, anchor="center")
+                elif col in "INSTRUMENTS":
+                    self.treeview.column(col, width=max_widths[i] + 20, anchor="center")
+                elif col in "POSITION":
+                    self.treeview.column(col, width=max_widths[i] + 30, anchor="center")
                 else:
                     self.treeview.column(col, width=max_widths[i], anchor="center")
                 self.treeview.heading(col, text=col)
@@ -171,7 +173,7 @@ class CustomApp:
 
 
             for data in rows:
-                mapped_data = [data.get(col, "") for col in ("MemberID", "MemberName", "Gender", "Department", "UniformSize", "Address", "Age", "Instrument")]
+                mapped_data = [data.get(col, "") for col in ("MemberID", "MemberName", "Age", "Gender", "Department", "UniformSize", "Address", "Instrument", "BandPosition")]
                 self.treeview.insert("", tk.END, values=mapped_data, tags="white_text")
 
             # Define a tag with white text color
@@ -196,13 +198,13 @@ class CustomApp:
             self.MEMBERNAME_ENTRY.delete(0, tk.END)
             self.MEMBERNAME_ENTRY.insert(0, item_data[1])  # FirstName
             self.AGE_ENTRY.delete(0, tk.END)
-            self.AGE_ENTRY.insert(0, item_data[6])  # Age
+            self.AGE_ENTRY.insert(0, item_data[2])  # Age
             self.DEPARTMENT_ENTRY.delete(0, tk.END)
-            self.DEPARTMENT_ENTRY.insert(0, item_data[3])  # Department
+            self.DEPARTMENT_ENTRY.insert(0, item_data[4])  # Department
             self.POSITION_ENTRY.delete(0, tk.END)
-            self.POSITION_ENTRY.insert(0, item_data[4])  # Position
+            self.POSITION_ENTRY.insert(0, item_data[8])  # Position
             self.ADDRESS_ENTRY.delete(0, tk.END)
-            self.ADDRESS_ENTRY.insert(0, item_data[5])  # Address
+            self.ADDRESS_ENTRY.insert(0, item_data[6])  # Address
 
 
 
@@ -235,7 +237,7 @@ class CustomApp:
             
                 cursor.execute(
                     """
-                    SELECT m.MemberID, m.MemberName, m.Gender, m.Department, m.UniformSize, m.Address, m.Age, i.Instrument
+                    SELECT m.MemberID, m.MemberName, m.Gender, m.Department, m.UniformSize, m.Address, m.Age, i.Instrument, i.BandPosition
                     FROM members m
                     LEFT JOIN instruments i ON m.MemberID = i.MemberID
                     """
@@ -244,7 +246,7 @@ class CustomApp:
                 # Search for entries by MemberID or MemberName
                 cursor.execute(
                     """
-                    SELECT m.MemberID, m.MemberName, m.Gender, m.Department, m.UniformSize, m.Address, m.Age, i.Instrument
+                    SELECT m.MemberID, m.MemberName, m.Gender, m.Department, m.UniformSize, m.Address, m.Age, i.Instrument, i.BandPosition
                     FROM members m
                     LEFT JOIN instruments i ON m.MemberID = i.MemberID
                     WHERE m.MemberID = %s OR m.MemberName LIKE %s
@@ -256,14 +258,14 @@ class CustomApp:
 
             conn.close()
 
-            max_widths = [len(col) * 10 for col in ("ID", "NAME", "GENDER", "DEPARTMENT", "UNIFORMSIZE", "ADDRESS", "AGE", "INSTRUMENTS")]
+            max_widths = [len(col) * 10 for col in ("ID", "NAME", "GENDER", "DEPARTMENT", "UNIFORMSIZE", "ADDRESS", "AGE", "INSTRUMENTS","POSITION")]
 
             # Clear the Treeview
             self.treeview.delete(*self.treeview.get_children())  # Use * to unpack the tuple
 
             # Insert data into the Treeview
             for data in rows:
-                mapped_data = [data.get(col, "") for col in ("MemberID", "MemberName", "Gender", "Department", "UniformSize", "Address", "Age", "Instrument")]
+                mapped_data = [data.get(col, "") for col in ("MemberID", "MemberName", "Age", "Gender", "Department", "UniformSize", "Address", "Instrument", "BandPosition")]
                 self.treeview.insert("", tk.END, values=mapped_data, tags="white_text")
 
         except mysql.connector.Error as e:
