@@ -106,6 +106,8 @@ class CustomApp:
         self.ADDRESS_ENTRY.bind("<FocusIn>", self.clear_default_value)
 
 
+# ... (Previous code)
+
     def create_widgets_treeview(self):
         try:
             conn = mysql.connector.connect(
@@ -116,40 +118,66 @@ class CustomApp:
             )
             cursor = conn.cursor(dictionary=True)
 
-            cursor.execute("SELECT MemberID, MemberName, Gender, Department, UniformSize, Address, Age FROM members")
+            # Updated SELECT statement to join the members and instruments tables
+            cursor.execute(
+                """
+                SELECT m.MemberID, m.MemberName, m.Gender, m.Department, m.UniformSize, m.Address, m.Age, i.Instrument
+                FROM members m
+                LEFT JOIN instruments i ON m.MemberID = i.MemberID
+                """
+            )
             rows = cursor.fetchall()
 
             conn.close()
 
-            columns = ("ID", "NAME", "GENDER", "DEPARTMENT", "UNIFORMSIZE", "ADDRESS", "AGE")
+            columns = ("ID", "NAME", "GENDER", "DEPARTMENT", "UNIFORMSIZE", "ADDRESS", "AGE", "INSTRUMENTS")
             maroon_color = "#420303"
 
             # Create Style instance
             style = ttk.Style()
             style.configure(f"{maroon_color}.Treeview", background=maroon_color)
 
+            # Adjusted the x-coordinate of the Treeview widget
             self.treeview = ttk.Treeview(self.canvas, columns=columns, show="headings", height=9, style=f"{maroon_color}.Treeview")
-            self.treeview.place(x=50, y=390)
+            self.treeview.place(x=30, y=390)
+
+             # Create a vertical scrollbar
+            scrollbar = ttk.Scrollbar(self.canvas, orient="vertical", command=self.treeview.yview)
+            scrollbar.place(x=740, y=390, height=206)  # Adjust the x, y, and height as needed
+
+            # Configure the Treeview to use the scrollbar
+            self.treeview.configure(yscrollcommand=scrollbar.set)
+
+
 
             max_widths = [len(col) * 10 for col in columns]  # Initial widths based on column names
 
             for data in rows:
-                mapped_data = [data.get(col, "") for col in ("MemberID", "MemberName", "Gender", "Department", "UniformSize", "Address", "Age")]
+                mapped_data = [data.get(col, "") for col in columns]
                 for i, value in enumerate(mapped_data):
                     max_widths[i] = max(max_widths[i], len(str(value)) * 10)
 
             for i, col in enumerate(columns):
+                # Manually set the width for the 'MemberName' column
+                if col == "NAME":
+                    self.treeview.column(col, width=max_widths[i] + 140, anchor="center")
+                # Manually set the width for the 'Instrument' column
+                elif col == "INSTRUMENTS":
+                    self.treeview.column(col, width=max_widths[i] + 40, anchor="center")
+                else:
+                    self.treeview.column(col, width=max_widths[i], anchor="center")
                 self.treeview.heading(col, text=col)
-                self.treeview.column(col, width=max_widths[i], anchor="center")
+
+
 
             for data in rows:
-                mapped_data = [data.get(col, "") for col in ("MemberID", "MemberName", "Gender", "Department", "UniformSize", "Address", "Age")]
+                mapped_data = [data.get(col, "") for col in ("MemberID", "MemberName", "Gender", "Department", "UniformSize", "Address", "Age", "Instrument")]
                 self.treeview.insert("", tk.END, values=mapped_data, tags="white_text")
 
             # Define a tag with white text color
             self.treeview.tag_configure("white_text", foreground="white")
 
-            # Correct the binding for left mouse button release event
+            # Correct the binding for the left mouse button release event
             self.treeview.bind("<ButtonRelease-1>", self.on_treeview_click)
 
         except mysql.connector.Error as e:
@@ -168,7 +196,7 @@ class CustomApp:
             self.MEMBERNAME_ENTRY.delete(0, tk.END)
             self.MEMBERNAME_ENTRY.insert(0, item_data[1])  # FirstName
             self.AGE_ENTRY.delete(0, tk.END)
-            self.AGE_ENTRY.insert(0, item_data[2])  # Age
+            self.AGE_ENTRY.insert(0, item_data[6])  # Age
             self.DEPARTMENT_ENTRY.delete(0, tk.END)
             self.DEPARTMENT_ENTRY.insert(0, item_data[3])  # Department
             self.POSITION_ENTRY.delete(0, tk.END)
@@ -193,12 +221,7 @@ class CustomApp:
 
 
     def search_entry_by_id_and_name(self, event):
-        # Get the search term from the entry widget
         search_term = self.SEARCH_ENTRY.get().strip()
-
-        # Define columns
-        columns = ("ID", "NAME", "GENDER", "DEPARTMENT", "UNIFORMSIZE", "ADDRESS", "AGE")
-
         try:
             conn = mysql.connector.connect(
                 host="127.0.0.1",
@@ -209,12 +232,23 @@ class CustomApp:
             cursor = conn.cursor(dictionary=True)
 
             if not search_term:
-                # If the search term is empty, fetch all entries
-                cursor.execute("SELECT MemberID, MemberName, Gender, Department, UniformSize, Address, Age FROM members")
+            
+                cursor.execute(
+                    """
+                    SELECT m.MemberID, m.MemberName, m.Gender, m.Department, m.UniformSize, m.Address, m.Age, i.Instrument
+                    FROM members m
+                    LEFT JOIN instruments i ON m.MemberID = i.MemberID
+                    """
+                )
             else:
                 # Search for entries by MemberID or MemberName
                 cursor.execute(
-                    "SELECT MemberID, MemberName, Gender, Department, UniformSize, Address, Age FROM members WHERE MemberID = %s OR MemberName LIKE %s",
+                    """
+                    SELECT m.MemberID, m.MemberName, m.Gender, m.Department, m.UniformSize, m.Address, m.Age, i.Instrument
+                    FROM members m
+                    LEFT JOIN instruments i ON m.MemberID = i.MemberID
+                    WHERE m.MemberID = %s OR m.MemberName LIKE %s
+                    """,
                     (search_term, f'%{search_term}%')
                 )
 
@@ -222,18 +256,19 @@ class CustomApp:
 
             conn.close()
 
-            max_widths = [len(col) * 10 for col in columns]
+            max_widths = [len(col) * 10 for col in ("ID", "NAME", "GENDER", "DEPARTMENT", "UNIFORMSIZE", "ADDRESS", "AGE", "INSTRUMENTS")]
 
             # Clear the Treeview
             self.treeview.delete(*self.treeview.get_children())  # Use * to unpack the tuple
 
             # Insert data into the Treeview
             for data in rows:
-                mapped_data = [data.get(col, "") for col in ("MemberID", "MemberName", "Gender", "Department", "UniformSize", "Address", "Age")]
+                mapped_data = [data.get(col, "") for col in ("MemberID", "MemberName", "Gender", "Department", "UniformSize", "Address", "Age", "Instrument")]
                 self.treeview.insert("", tk.END, values=mapped_data, tags="white_text")
 
         except mysql.connector.Error as e:
             print(f"MySQL Error: {e}")
+
 
 
 
