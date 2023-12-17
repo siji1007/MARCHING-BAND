@@ -2,6 +2,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from tkinter import Tk, Button,Entry,Frame,ttk, messagebox
 import sqlite3
+#YOU CAN IMPORT SQL_CONNECTOR FOR MYSQL TO CONNECT SQL FILE TO TKINTER PYTHON
 
 class CustomApp:
     def __init__(self, master):
@@ -10,11 +11,16 @@ class CustomApp:
         self.master.geometry("800x700")
         self.master.resizable(False, False)
 
+
+
+        #HERE ALL THE WIDGETS SHOWED ON THE MAIN WINDOW WHICH HAS THEIR OWN ORGANIZED WIDGETS CATEGORY
         self.create_widgets_background()
         self.create_widgets_buttons()
         self.create_widgets_entry()
-        #self.create_widgets_frames()
+        #self.create_widgets_frames() never mind this one, i am thunking for the design 
         self.create_widgets_treeview()
+
+
 
     def create_widgets_background(self):
         original_image = Image.open("Dashboard.png")
@@ -26,6 +32,8 @@ class CustomApp:
         self.canvas.pack(fill="both", expand=True)
         self.canvas.create_image(0, 0, anchor="nw", image=self.bg_image)
 
+
+    #HERE ALL THE BUTTONS
     def create_widgets_buttons(self):
 
         #SEARCH BUTTON
@@ -57,7 +65,7 @@ class CustomApp:
         self.DELETE_button = Button(self.canvas, image=self.DELETE_IMAGE, bd=0, height=25, width=56, compound='center', relief=tk.FLAT,highlightthickness=0,command=self.delete_selected_entry)
         self.DELETE_button.place(x=693, y=105)
 
-
+    #HERE ALL THE ENTRY BOX
     def create_widgets_entry(self):
         default_value = "Search"
         
@@ -73,7 +81,7 @@ class CustomApp:
 
 
         #MEMBER_NAME ENTRY 
-        default_value_ENTRIES ="INPUT TEXT"
+        default_value_ENTRIES ="INPUT NAME"
         self.MEMBERNAME_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
         self.MEMBERNAME_ENTRY.place(x=60, y=210)
         self.MEMBERNAME_ENTRY.insert(0, default_value_ENTRIES)
@@ -82,28 +90,47 @@ class CustomApp:
         #AGE
         self.AGE_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
         self.AGE_ENTRY.place(x=60, y=265)
-        self.AGE_ENTRY.insert(0, default_value_ENTRIES)
+        self.AGE_ENTRY.insert(0, "INPUT AGE")
         self.AGE_ENTRY.bind("<FocusIn>", self.clear_default_value)
 
         #DEPARTMENT
         self.DEPARTMENT_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
         self.DEPARTMENT_ENTRY.place(x=60, y=320)
-        self.DEPARTMENT_ENTRY.insert(0, default_value_ENTRIES)
+        self.DEPARTMENT_ENTRY.insert(0, "INPUT DEPARTMENT")
         self.DEPARTMENT_ENTRY.bind("<FocusIn>", self.clear_default_value)
 
         #BAND POSITION
         self.POSITION_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
         self.POSITION_ENTRY.place(x=433, y=210)
-        self.POSITION_ENTRY.insert(0, default_value_ENTRIES)
+        self.POSITION_ENTRY.insert(0, "INPUT POSITION")
         self.POSITION_ENTRY.bind("<FocusIn>", self.clear_default_value)
 
         #ADDRESS
         self.ADDRESS_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
         self.ADDRESS_ENTRY.place(x=433, y=265)
-        self.ADDRESS_ENTRY.insert(0, default_value_ENTRIES)
+        self.ADDRESS_ENTRY.insert(0, "INPUT ADDRESS")
         self.ADDRESS_ENTRY.bind("<FocusIn>", self.clear_default_value)
 
 
+    #CLEAR THE DEFAULT VALUE WHEN THE USER CLICK THE ENTRY BOXE'S
+    def clear_default_value(self, event):
+        current_entry = event.widget
+
+        if current_entry == self.SEARCH_ENTRY and self.SEARCH_ENTRY.get() == "Search":
+            self.SEARCH_ENTRY.delete(0, tk.END)
+        elif current_entry == self.MEMBERNAME_ENTRY and self.MEMBERNAME_ENTRY.get() == "INPUT NAME":
+            self.MEMBERNAME_ENTRY.delete(0, tk.END)
+        elif current_entry == self.AGE_ENTRY and self.AGE_ENTRY.get() == "INPUT AGE":
+            self.AGE_ENTRY.delete(0, tk.END)
+        elif current_entry == self.DEPARTMENT_ENTRY and self.DEPARTMENT_ENTRY.get() == "INPUT DEPARTMENT":
+            self.DEPARTMENT_ENTRY.delete(0, tk.END)
+        elif current_entry == self.POSITION_ENTRY and self.POSITION_ENTRY.get() == "INPUT POSITION":
+            self.POSITION_ENTRY.delete(0, tk.END)
+        elif current_entry == self.ADDRESS_ENTRY and self.ADDRESS_ENTRY.get() == "INPUT ADDRESS":
+            self.ADDRESS_ENTRY.delete(0, tk.END)
+        
+
+    #HERE IS THE CODE OF TREEVIEW YOU CAN MODIFY THE TABLE HERE
     def create_widgets_treeview(self):
         # Connect to the SQLite database
         conn = sqlite3.connect("band_members.db")
@@ -151,6 +178,7 @@ class CustomApp:
 
 
 
+    #HERE IS THE CODE FOR BINDING OF DATA INSIDE THE TREEVIEW
     def on_treeview_click(self, event):
         # Get the selected item
         selected_item = self.treeview.selection()
@@ -173,6 +201,7 @@ class CustomApp:
 
 
 
+    #DELETE FUNCTION FOR THE DELETE BUTTON
     def delete_selected_entry(self):
         # Get the selected item
         selected_item = self.treeview.selection()
@@ -205,20 +234,10 @@ class CustomApp:
                 self.create_widgets_treeview()
 
 
-    def clear_default_value(self, event):
-        # Clear default value when the entry is clicked
-        if self.SEARCH_ENTRY.get() == "Search":
-            self.SEARCH_ENTRY.delete(0, tk.END)
-        if self.MEMBERNAME_ENTRY.get() and self.AGE_ENTRY.get() and self.DEPARTMENT_ENTRY.get() and self.POSITION_ENTRY.get() and self.ADDRESS_ENTRY.get() == "INPUT TEXT":
-            self.MEMBERNAME_ENTRY.delete(0,tk.END)
-            self.AGE_ENTRY.delete(0,tk.END)
-            self.DEPARTMENT_ENTRY.delete(0,tk.END)
-            self.POSITION_ENTRY.delete(0,tk.END)
-            self.ADDRESS_ENTRY.delete(0,tk.END)
 
-    
+    #ADD FUNCTION FOR ADD BUTTON
     def add_entry_to_database(self):
- # Get entry values
+
         member_name = self.MEMBERNAME_ENTRY.get()
         age = self.AGE_ENTRY.get()
         department = self.DEPARTMENT_ENTRY.get()
@@ -229,7 +248,6 @@ class CustomApp:
         if not (member_name and age and department and position and address):
             messagebox.showwarning("Incomplete Entry", "Please fill in all the required fields.")
             return
-
         # Connect to the database
         conn = sqlite3.connect("band_members.db")
         c = conn.cursor()
@@ -254,6 +272,7 @@ class CustomApp:
 
 
 
+    #UPDATE FUNCTION FOR UPDATE BUTTON
     def update_selected_entry(self):
             # Get the selected item
             selected_item = self.treeview.selection()
@@ -295,6 +314,7 @@ class CustomApp:
                 self.create_widgets_treeview()
 
 
+    #REAL TIME SEARCH AND ALSO FOR SEARCH BUTTON FUNCTION
     def search_entry_by_id_and_name(self):
             # Get the search term from the entry widget
             search_term = self.SEARCH_ENTRY.get().strip()
