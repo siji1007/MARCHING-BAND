@@ -16,6 +16,9 @@ class CustomApp:
         #self.create_widgets_frames()
         self.create_widgets_treeview()
 
+        CustomApp.next_member_id = 51  # Initialize next_member_id at the class level
+
+
     def create_widgets_background(self):
         original_image = Image.open("Dashboard.png")
         width, height = 800, 700
@@ -33,7 +36,7 @@ class CustomApp:
         resized_image = SEARCH_image.resize((50, 25), Image.LANCZOS)
         self.SEARCH_image = ImageTk.PhotoImage(resized_image)
         self.SEARCH_button = Button(self.canvas, image=self.SEARCH_image, bd=0, height=25, width=50, compound='center', relief=tk.FLAT,highlightthickness=0)
-        self.SEARCH_button.place(x=517, y=105)
+        self.SEARCH_button.place(x=506, y=75)
         self.SEARCH_button.bind("<ButtonRelease-1>", self.search_entry_by_id_and_name)
 
 
@@ -42,21 +45,24 @@ class CustomApp:
         resized_ADD_image = ADD_IMAGE.resize((30, 25), Image.LANCZOS)
         self.ADD_IMAGE = ImageTk.PhotoImage(resized_ADD_image)
         self.ADD_button = Button(self.canvas, image=self.ADD_IMAGE, bd=0, height=25, width=30, compound='center', relief=tk.FLAT,highlightthickness=0)
-        self.ADD_button.place(x=591, y=105)
+        self.ADD_button.place(x=565, y=74)
+        self.ADD_button.bind("<ButtonRelease-1>", self.add_member)
 
         #UPDATE BUTTON
         UPDATE_IMAGE = Image.open("UPDATE.png")
         resized_UPDATE_image = UPDATE_IMAGE.resize((56, 25), Image.LANCZOS)
         self.UPDATE_IMAGE = ImageTk.PhotoImage(resized_UPDATE_image)
         self.UPDATE_button = Button(self.canvas, image=self.UPDATE_IMAGE, bd=0, height=25, width=56, compound='center', relief=tk.FLAT,highlightthickness=0)
-        self.UPDATE_button.place(x=630, y=105)
+        self.UPDATE_button.place(x=600, y=74)
+        self.UPDATE_button.bind("<ButtonRelease-1>", self.update_member)
 
         #DELETE BUTTON
         DELETE_IMAGE = Image.open("DELETE.png")
         resized_DELETE_image = DELETE_IMAGE.resize((56, 25), Image.LANCZOS)
         self.DELETE_IMAGE = ImageTk.PhotoImage(resized_DELETE_image)
         self.DELETE_button = Button(self.canvas, image=self.DELETE_IMAGE, bd=0, height=25, width=56, compound='center', relief=tk.FLAT,highlightthickness=0)
-        self.DELETE_button.place(x=693, y=105)
+        self.DELETE_button.place(x=660, y=74)
+        self.DELETE_button.bind("<ButtonRelease-1>", self.delete_member)
 
 
     def create_widgets_entry(self):
@@ -64,7 +70,7 @@ class CustomApp:
         
 
         self.SEARCH_ENTRY = Entry(self.canvas, width=16, font=('Arial', 14),bd=0, bg="#993333",fg="white")
-        self.SEARCH_ENTRY.place(x=340, y=106)
+        self.SEARCH_ENTRY.place(x=329, y=75)
 
     # Set default value
         self.SEARCH_ENTRY.insert(0, default_value)
@@ -75,38 +81,58 @@ class CustomApp:
 
 
         #MEMBER_NAME ENTRY 
-        default_value_ENTRIES ="INPUT TEXT"
+        default_value_ENTRIES ="INPUT HERE"
         self.MEMBERNAME_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
-        self.MEMBERNAME_ENTRY.place(x=60, y=210)
+        self.MEMBERNAME_ENTRY.place(x=58, y=183)
         self.MEMBERNAME_ENTRY.insert(0, default_value_ENTRIES)
         self.MEMBERNAME_ENTRY.bind("<FocusIn>", self.clear_default_value)
 
         #AGE
         self.AGE_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
-        self.AGE_ENTRY.place(x=60, y=265)
+        self.AGE_ENTRY.place(x=58, y=235)
         self.AGE_ENTRY.insert(0, default_value_ENTRIES)
         self.AGE_ENTRY.bind("<FocusIn>", self.clear_default_value)
 
+        #GENDER
+        self.GENDER_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
+        self.GENDER_ENTRY.place(x=58, y=280)
+        self.GENDER_ENTRY.insert(0, default_value_ENTRIES)
+        self.GENDER_ENTRY.bind("<FocusIn>", self.clear_default_value)
+
         #DEPARTMENT
         self.DEPARTMENT_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
-        self.DEPARTMENT_ENTRY.place(x=60, y=320)
+        self.DEPARTMENT_ENTRY.place(x=57, y=332)
         self.DEPARTMENT_ENTRY.insert(0, default_value_ENTRIES)
         self.DEPARTMENT_ENTRY.bind("<FocusIn>", self.clear_default_value)
 
+
+        """THIS IS THE SECOND FORM"""
+        #UNIFORM SIZE
+        self.UNIFORM_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
+        self.UNIFORM_ENTRY.place(x=440, y=183)
+        self.UNIFORM_ENTRY.insert(0, default_value_ENTRIES)
+        self.UNIFORM_ENTRY.bind("<FocusIn>", self.clear_default_value)
+
+        #INSTRUMENT
+        self.INSTRUMENT_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
+        self.INSTRUMENT_ENTRY.place(x=440, y=235)
+        self.INSTRUMENT_ENTRY.insert(0, default_value_ENTRIES)
+        self.INSTRUMENT_ENTRY.bind("<FocusIn>", self.clear_default_value)
+
+
         #BAND POSITION
         self.POSITION_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
-        self.POSITION_ENTRY.place(x=433, y=210)
+        self.POSITION_ENTRY.place(x=440, y=280)
         self.POSITION_ENTRY.insert(0, default_value_ENTRIES)
         self.POSITION_ENTRY.bind("<FocusIn>", self.clear_default_value)
 
         #ADDRESS
         self.ADDRESS_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
-        self.ADDRESS_ENTRY.place(x=433, y=265)
+        self.ADDRESS_ENTRY.place(x=440, y=332)
         self.ADDRESS_ENTRY.insert(0, default_value_ENTRIES)
         self.ADDRESS_ENTRY.bind("<FocusIn>", self.clear_default_value)
 
 
-# ... (Previous code)
 
     def create_widgets_treeview(self):
         try:
@@ -139,11 +165,11 @@ class CustomApp:
 
             # Adjusted the x-coordinate of the Treeview widget
             self.treeview = ttk.Treeview(self.canvas, columns=columns, show="headings", height=9, style=f"{maroon_color}.Treeview")
-            self.treeview.place(x=5, y=390)
+            self.treeview.place(x=5, y=435)
 
              # Create a vertical scrollbar
             scrollbar = ttk.Scrollbar(self.canvas, orient="vertical", command=self.treeview.yview)
-            scrollbar.place(x=777, y=390, height=206)  # Adjust the x, y, and height as needed
+            scrollbar.place(x=777, y=435, height=206)  # Adjust the x, y, and height as needed
 
             # Configure the Treeview to use the scrollbar
             self.treeview.configure(yscrollcommand=scrollbar.set)
@@ -205,21 +231,27 @@ class CustomApp:
             self.POSITION_ENTRY.insert(0, item_data[8])  # Position
             self.ADDRESS_ENTRY.delete(0, tk.END)
             self.ADDRESS_ENTRY.insert(0, item_data[6])  # Address
-
-
-
-  
+            #GENDER
+            self.GENDER_ENTRY.delete(0, tk.END)
+            self.GENDER_ENTRY.insert(0, item_data[3]) 
+            #UNIFORM
+            self.UNIFORM_ENTRY.delete(0, tk.END)
+            self.UNIFORM_ENTRY.insert(0, item_data[5]) 
+            #INSTRUMENT
+            self.INSTRUMENT_ENTRY.delete(0, tk.END)
+            self.INSTRUMENT_ENTRY.insert(0, item_data[7]) 
+            
 
     def clear_default_value(self, event):
         # Clear default value when the entry is clicked
-        if self.SEARCH_ENTRY.get() == "Search":
+        if self.SEARCH_ENTRY.get() == "Search" and event.widget == self.SEARCH_ENTRY:
             self.SEARCH_ENTRY.delete(0, tk.END)
-        if self.MEMBERNAME_ENTRY.get() and self.AGE_ENTRY.get() and self.DEPARTMENT_ENTRY.get() and self.POSITION_ENTRY.get() and self.ADDRESS_ENTRY.get() == "INPUT TEXT":
-            self.MEMBERNAME_ENTRY.delete(0,tk.END)
-            self.AGE_ENTRY.delete(0,tk.END)
-            self.DEPARTMENT_ENTRY.delete(0,tk.END)
-            self.POSITION_ENTRY.delete(0,tk.END)
-            self.ADDRESS_ENTRY.delete(0,tk.END)
+
+        # Check the entry that currently has focus and clear it if necessary
+        focused_entry = self.master.focus_get()
+        if focused_entry and focused_entry != self.SEARCH_ENTRY:
+            if focused_entry.get() == "INPUT HERE":
+                focused_entry.delete(0, tk.END)
 
 
     def search_entry_by_id_and_name(self, event):
@@ -270,6 +302,211 @@ class CustomApp:
 
         except mysql.connector.Error as e:
             print(f"MySQL Error: {e}")
+
+
+    def get_next_member_id(self):
+        """Generate the next available MemberID."""
+        member_id = self.next_member_id
+        self.next_member_id += 1
+        return member_id
+
+
+    def update_member(self, event):
+        # Get the selected item
+        selected_item = self.treeview.selection()
+
+        if selected_item:
+            # Fetch data from the selected item
+            item_data = self.treeview.item(selected_item, "values")
+            
+            # Get updated data from entry widgets
+            member_name = self.MEMBERNAME_ENTRY.get()
+            age = self.AGE_ENTRY.get()
+            gender = self.GENDER_ENTRY.get()
+            department = self.DEPARTMENT_ENTRY.get()
+            uniform_size = self.UNIFORM_ENTRY.get()
+            instrument = self.INSTRUMENT_ENTRY.get()
+            position = self.POSITION_ENTRY.get()
+            address = self.ADDRESS_ENTRY.get()
+
+            # Validate required fields (you can add more validation as needed)
+            if not member_name or not age or not gender or not department:
+                messagebox.showerror("Error", "Please fill in all required fields.")
+                return
+
+            try:
+                conn = mysql.connector.connect(
+                    host="127.0.0.1",
+                    user="root",
+                    password="POGIako2003",
+                    database="band"
+                )
+                cursor = conn.cursor()
+
+                # Update the member information
+                cursor.execute(
+                    """
+                    UPDATE members
+                    SET MemberName=%s, Age=%s, Gender=%s, Department=%s, UniformSize=%s, Address=%s
+                    WHERE MemberID=%s
+                    """,
+                    (member_name, age, gender, department, uniform_size, address, item_data[0])  # item_data[0] is the MemberID
+                )
+
+                # Update the instrument information
+                cursor.execute(
+                    """
+                    UPDATE instruments
+                    SET Instrument=%s, BandPosition=%s
+                    WHERE MemberID=%s
+                    """,
+                    (instrument, position, item_data[0])  # item_data[0] is the MemberID
+                )
+
+                conn.commit()
+
+                # Update the Treeview to display the updated member
+                self.search_entry_by_id_and_name(None)  # Call the search function to refresh the Treeview
+
+                messagebox.showinfo("Success", "Member updated successfully.")
+
+            except mysql.connector.Error as e:
+                messagebox.showerror("Error", f"MySQL Error: {e}")
+
+            finally:
+                if conn:
+                    conn.close()
+
+
+
+
+
+
+    def add_member(self, event):
+        # Get data from entry widgets
+        member_name = self.MEMBERNAME_ENTRY.get()
+        age = self.AGE_ENTRY.get()
+        gender = self.GENDER_ENTRY.get()
+        department = self.DEPARTMENT_ENTRY.get()
+        uniform_size = self.UNIFORM_ENTRY.get()
+        instrument = self.INSTRUMENT_ENTRY.get()
+        position = self.POSITION_ENTRY.get()
+        address = self.ADDRESS_ENTRY.get()
+
+        # Validate required fields (you can add more validation as needed)
+        if not member_name or not age or not gender or not department:
+            messagebox.showerror("Error", "Please fill in all required fields.")
+            return
+
+        try:
+            conn = mysql.connector.connect(
+                host="127.0.0.1",
+                user="root",
+                password="POGIako2003",
+                database="band"
+            )
+            cursor = conn.cursor()
+
+            # Get the next available MemberID
+            member_id = self.get_next_member_id()
+
+            # Insert the new member information
+            cursor.execute(
+                """
+                INSERT INTO members (MemberID, MemberName, Age, Gender, Department, UniformSize, Address)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """,
+                (member_id, member_name, age, gender, department, uniform_size, address)
+            )
+
+            # Insert the instrument information
+            cursor.execute(
+                """
+                INSERT INTO instruments (MemberID, Instrument, BandPosition)
+                VALUES (%s, %s, %s)
+                """,
+                (member_id, instrument, position)
+            )
+
+            conn.commit()
+
+            # Update the Treeview to display the added member
+            self.search_entry_by_id_and_name(None)  # Call the search function to refresh the Treeview
+
+            messagebox.showinfo("Success", "Member added successfully.")
+
+            self.MEMBERNAME_ENTRY.delete(0, tk.END)
+            self.AGE_ENTRY.delete(0, tk.END)
+            self.GENDER_ENTRY.delete(0, tk.END)
+            self.DEPARTMENT_ENTRY.delete(0, tk.END)
+            self.UNIFORM_ENTRY.delete(0, tk.END)
+            self.INSTRUMENT_ENTRY.delete(0, tk.END)
+            self.POSITION_ENTRY.delete(0, tk.END)
+            self.ADDRESS_ENTRY.delete(0, tk.END)
+
+        except mysql.connector.Error as e:
+            messagebox.showerror("Error", f"MySQL Error: {e}")
+
+        finally:
+            if conn:
+                conn.close()
+
+
+
+
+
+    def delete_member(self, event):
+        # Get the selected item
+        selected_item = self.treeview.selection()
+
+        if selected_item:
+            # Fetch data from the selected item
+            item_data = self.treeview.item(selected_item, "values")
+            
+            # Get MemberID
+            member_id = item_data[0]
+
+            try:
+                conn = mysql.connector.connect(
+                    host="127.0.0.1",
+                    user="root",
+                    password="POGIako2003",
+                    database="band"
+                )
+                cursor = conn.cursor()
+
+                # Delete the instrument information first
+                cursor.execute("DELETE FROM instruments WHERE MemberID = %s", (member_id,))
+
+                # Delete the member information
+                cursor.execute("DELETE FROM members WHERE MemberID = %s", (member_id,))
+
+                conn.commit()
+
+                # Update the Treeview to display the updated list
+                self.search_entry_by_id_and_name(None)  # Call the search function to refresh the Treeview
+
+                messagebox.showinfo("Success", "Member deleted successfully.")
+
+                self.MEMBERNAME_ENTRY.delete(0, tk.END)
+                self.AGE_ENTRY.delete(0, tk.END)
+                self.GENDER_ENTRY.delete(0, tk.END)
+                self.DEPARTMENT_ENTRY.delete(0, tk.END)
+                self.UNIFORM_ENTRY.delete(0, tk.END)
+                self.INSTRUMENT_ENTRY.delete(0, tk.END)
+                self.POSITION_ENTRY.delete(0, tk.END)
+                self.ADDRESS_ENTRY.delete(0, tk.END)
+
+            except mysql.connector.Error as e:
+                messagebox.showerror("Error", f"MySQL Error: {e}")
+
+            finally:
+                if conn:
+                    conn.close()
+
+
+
+
 
 
 
