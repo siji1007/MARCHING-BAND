@@ -16,7 +16,8 @@ class CustomApp:
         #self.create_widgets_frames()
         self.create_widgets_treeview()
 
-        CustomApp.next_member_id = 51  # Initialize next_member_id at the class level
+       # Initialize next_member_id at the class level
+        self.update_next_member_id()
 
 
     def create_widgets_background(self):
@@ -164,12 +165,12 @@ class CustomApp:
             style.configure(f"{maroon_color}.Treeview", background=maroon_color)
 
             # Adjusted the x-coordinate of the Treeview widget
-            self.treeview = ttk.Treeview(self.canvas, columns=columns, show="headings", height=9, style=f"{maroon_color}.Treeview")
+            self.treeview = ttk.Treeview(self.canvas, columns=columns, show="headings", height=10, style=f"{maroon_color}.Treeview")
             self.treeview.place(x=5, y=435)
 
              # Create a vertical scrollbar
             scrollbar = ttk.Scrollbar(self.canvas, orient="vertical", command=self.treeview.yview)
-            scrollbar.place(x=777, y=435, height=206)  # Adjust the x, y, and height as needed
+            scrollbar.place(x=777, y=435, height=225)  # Adjust the x, y, and height as needed
 
             # Configure the Treeview to use the scrollbar
             self.treeview.configure(yscrollcommand=scrollbar.set)
@@ -304,11 +305,36 @@ class CustomApp:
             print(f"MySQL Error: {e}")
 
 
+    def update_next_member_id(self):
+        try:
+            conn = mysql.connector.connect(
+                host="127.0.0.1",
+                user="root",
+                password="POGIako2003",
+                database="band"
+            )
+            cursor = conn.cursor()
+
+            # Fetch the maximum MemberID from the members table
+            cursor.execute("SELECT MAX(MemberID) FROM members")
+            max_member_id = cursor.fetchone()[0]
+
+            # Set next_member_id to the maximum MemberID + 1
+            self.next_member_id = max_member_id + 1 if max_member_id is not None else 1
+
+            conn.close()
+
+        except mysql.connector.Error as e:
+            print(f"MySQL Error: {e}")
+
     def get_next_member_id(self):
-        """Generate the next available MemberID."""
-        member_id = self.next_member_id
-        self.next_member_id += 1
-        return member_id
+        # Dynamically update the next_member_id before returning it
+        self.update_next_member_id()
+        return self.next_member_id
+
+
+
+
 
 
     def update_member(self, event):
@@ -378,10 +404,6 @@ class CustomApp:
                     conn.close()
 
 
-
-
-
-
     def add_member(self, event):
         # Get data from entry widgets
         member_name = self.MEMBERNAME_ENTRY.get()
@@ -430,8 +452,9 @@ class CustomApp:
 
             conn.commit()
 
-            # Update the Treeview to display the added member
-            self.search_entry_by_id_and_name(None)  # Call the search function to refresh the Treeview
+            # Append the new member directly to the Treeview
+            mapped_data = (member_id, member_name, age, gender, department, uniform_size, address, instrument, position)
+            self.treeview.insert("", tk.END, values=mapped_data, tags="white_text")
 
             messagebox.showinfo("Success", "Member added successfully.")
 
@@ -462,7 +485,7 @@ class CustomApp:
         if selected_item:
             # Fetch data from the selected item
             item_data = self.treeview.item(selected_item, "values")
-            
+
             # Get MemberID
             member_id = item_data[0]
 
@@ -483,11 +506,12 @@ class CustomApp:
 
                 conn.commit()
 
-                # Update the Treeview to display the updated list
-                self.search_entry_by_id_and_name(None)  # Call the search function to refresh the Treeview
+                # Remove the selected item directly from the Treeview
+                self.treeview.delete(selected_item)
 
                 messagebox.showinfo("Success", "Member deleted successfully.")
 
+                # Clear the entry widgets
                 self.MEMBERNAME_ENTRY.delete(0, tk.END)
                 self.AGE_ENTRY.delete(0, tk.END)
                 self.GENDER_ENTRY.delete(0, tk.END)
@@ -503,6 +527,7 @@ class CustomApp:
             finally:
                 if conn:
                     conn.close()
+
 
 
 
