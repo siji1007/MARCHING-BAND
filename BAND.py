@@ -65,6 +65,25 @@ class CustomApp:
         self.DELETE_button.place(x=660, y=74)
         self.DELETE_button.bind("<ButtonRelease-1>", self.delete_member)
 
+        #CLEAR BUTTON
+        CLEAR_IMAGE = Image.open("CLEAR.png")
+        resized_CLEAR_image = CLEAR_IMAGE.resize((56, 25), Image.LANCZOS)
+        self.CLEAR_IMAGE = ImageTk.PhotoImage(resized_CLEAR_image)
+        self.CLEAR_button = Button(self.canvas, image=self.CLEAR_IMAGE, bd=0, height=25, width=56, compound='center', relief=tk.FLAT,highlightthickness=0,command=self.clear_entries)
+        self.CLEAR_button.place(x=718, y=74)
+        
+
+
+    def clear_entries(self):
+        self.MEMBERNAME_ENTRY.delete(0, tk.END)
+        self.AGE_ENTRY.delete(0, tk.END)
+        self.GENDER_ENTRY.delete(0, tk.END)
+        self.DEPARTMENT_ENTRY.delete(0, tk.END)
+        self.UNIFORM_ENTRY.delete(0, tk.END)
+        self.INSTRUMENT_ENTRY.delete(0, tk.END)
+        self.POSITION_ENTRY.delete(0, tk.END)
+        self.ADDRESS_ENTRY.delete(0, tk.END)
+
 
     def create_widgets_entry(self):
         default_value = "Search"
