@@ -4,6 +4,9 @@ from tkinter import Tk, Button,Entry,Frame,ttk, messagebox
 import mysql.connector
 import pandas as pd 
 import os
+from email.message import EmailMessage
+import smtplib
+import ssl
 
 class CustomApp:
     def __init__(self, master):
@@ -101,7 +104,7 @@ class CustomApp:
         username = self.USERNAME_ENTRY.get()
         password = self.PASSWORD_ENTRY.get()
         
-        if username == "INPUT USERNAME" and password == "INPUT PASSWORD":
+        if username == "ADMIN" and password == "ADMIN":
             self.show_main_widgets()
 
            
@@ -209,9 +212,48 @@ class CustomApp:
 
             messagebox.showinfo("Success", f"Data exported to {excel_file_path}")
 
+            email_account=self.EMAIL_ENTRY.get()
+            self.send_excel_email(email_account, excel_file_path)
+
+
+
         except mysql.connector.Error as e:
             print(f"MySQL Error: {e}")
 
+
+    #SEND EXCEL TO ACC
+    def send_excel_email(self, recipient_email, excel_file_path):
+        try:
+            email_sender = 'smartcook23@gmail.com'
+            email_password = 'asflajdmsabuomwh'
+            subject = 'Data Export from Your App'
+            body = 'Hello, THIS IS THE RECORD OF BAND MEMBERS.'
+
+            # Create the EmailMessage object
+            em = EmailMessage()
+            em['From'] = email_sender
+            em['To'] = recipient_email
+            em['Subject'] = subject
+            em.set_content(body)
+
+            # Attach the Excel file
+            with open(excel_file_path, 'rb') as f:
+                attachment_data = f.read()
+            filename = os.path.basename(excel_file_path)
+            em.add_attachment(attachment_data, maintype='application', subtype='octet-stream', filename=filename)
+
+            # Send the email
+            context = ssl.create_default_context()
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+                smtp.login(email_sender, email_password)
+                smtp.send_message(em)
+
+        except Exception as e:
+            print(f"Email sending error: {e}")
+
+        finally:
+            # Remove the Excel file after sending
+            os.remove(excel_file_path)
 
     #CLEAR ALL ENTRIES 
     def clear_entries(self):
@@ -301,6 +343,12 @@ class CustomApp:
         self.instrument_dropdown.set("Filter by Instruments")
         self.instrument_dropdown.place(x=650, y=412)
         self.instrument_dropdown.bind("<<ComboboxSelected>>", self.filter_by_instrument)
+
+
+        self.EMAIL_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#32A927",fg="white")
+        self.EMAIL_ENTRY.place(x=480, y=673)
+        self.EMAIL_ENTRY.insert(0, default_value_ENTRIES)
+        self.EMAIL_ENTRY.bind("<FocusIn>", self.clear_default_value)
 
 
     #SHOW HERE THE TREEVIEW
