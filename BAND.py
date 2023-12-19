@@ -2,14 +2,21 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from tkinter import Tk, Button,Entry,Frame,ttk, messagebox
 import mysql.connector
+import pandas as pd 
 
 class CustomApp:
     def __init__(self, master):
         self.master = master
-        self.master.title("CNSC Marching Band")
+        self.master.title("CNSC MARCHING BAND M-R")
+        self.master.iconbitmap(r'LOGO.ico')
         self.master.geometry("800x700")
         self.master.resizable(False, False)
 
+
+        self.LOGIN_FORM()
+        
+
+        '''
         self.create_widgets_background()
         self.create_widgets_buttons()
         self.create_widgets_entry()
@@ -18,10 +25,11 @@ class CustomApp:
 
        # Initialize next_member_id at the class level
         self.update_next_member_id()
+        '''
+    
 
-
-    def create_widgets_background(self):
-        original_image = Image.open("Dashboard.png")
+    def LOGIN_FORM(self):
+        original_image = Image.open("Dashboard_login.png")
         width, height = 800, 700
         resized_image = original_image.resize((width, height), Image.LANCZOS)
         self.bg_image = ImageTk.PhotoImage(resized_image)
@@ -29,6 +37,88 @@ class CustomApp:
         self.canvas = tk.Canvas(self.master, width=width, height=height)
         self.canvas.pack(fill="both", expand=True)
         self.canvas.create_image(0, 0, anchor="nw", image=self.bg_image)
+
+        default_value_ENTRIES_username ="INPUT USERNAME"
+        self.USERNAME_ENTRY = Entry(self.canvas, width=18, font=('Arial', 10,),bd=0, bg="#560F14",fg="white")
+        self.USERNAME_ENTRY.place(x=345, y=320)
+        self.USERNAME_ENTRY.insert(0, default_value_ENTRIES_username)
+        self.USERNAME_ENTRY.bind("<FocusIn>", self.clear_default_value_LOGIN)
+
+        
+        default_value_ENTRIES_password ="INPUT PASSWORD"
+        self.PASSWORD_ENTRY = Entry(self.canvas, width=18, font=('Arial', 10,),bd=0, bg="#560F14",fg="white")
+        self.PASSWORD_ENTRY.place(x=345, y=382)
+        self.PASSWORD_ENTRY.insert(0, default_value_ENTRIES_password)
+        self.PASSWORD_ENTRY.bind("<FocusIn>", self.clear_default_value_LOGIN)
+        
+
+        LOGIN_IMAGE = Image.open("LOGIN_BUTTON.png")
+        resized_LOGIN_image = LOGIN_IMAGE.resize((152, 23), Image.LANCZOS)
+        self.LOGIN_IMAGE = ImageTk.PhotoImage(resized_LOGIN_image)
+        self.LOGIN_button = Button(self.canvas, image=self.LOGIN_IMAGE, bd=0, height=23, width=152, compound='center', relief=tk.FLAT,highlightthickness=0,command=self.show)
+        self.LOGIN_button.place(x=320, y=433)
+
+
+    def clear_default_value_LOGIN(self, event):
+        # Check the entry that currently has focus and clear it if necessary
+        focused_entry = self.master.focus_get()
+
+        if focused_entry == self.USERNAME_ENTRY and focused_entry.get() == "INPUT USERNAME":
+            focused_entry.delete(0, tk.END)
+        elif focused_entry == self.PASSWORD_ENTRY and focused_entry.get() == "INPUT PASSWORD":
+            focused_entry.delete(0, tk.END)
+
+
+
+
+
+    def show_main_widgets(self):
+        # Destroy login form widgets
+        self.USERNAME_ENTRY.destroy()
+        self.PASSWORD_ENTRY.destroy()
+        self.LOGIN_button.destroy()
+
+        # Create main widgets
+
+        self.change_background("Dashboard.png")
+
+        
+        self.create_widgets_buttons()
+        self.create_widgets_entry()
+        self.create_widgets_treeview()
+        self.update_next_member_id()
+
+    def change_background(self, image_path):
+        original_image = Image.open("Dashboard.png")
+        width, height = 800, 700
+        resized_image = original_image.resize((width, height), Image.LANCZOS)
+        self.bg_image_MAIN = ImageTk.PhotoImage(resized_image)
+
+        # Delete existing canvas
+        self.canvas.destroy()
+
+        # Create a new canvas with the updated background image
+        self.canvas = tk.Canvas(self.master, width=width, height=height)
+        self.canvas.pack(fill="both", expand=True)
+        self.canvas.create_image(0, 0, anchor="nw", image=self.bg_image_MAIN)
+
+
+
+    def show(self):
+        username = self.USERNAME_ENTRY.get()
+        password = self.PASSWORD_ENTRY.get()
+        
+        if username == "ADMIN" and password == "ADMIN":
+            self.show_main_widgets()
+
+           
+
+        else:
+            # Show an error message or take other actions if login fails
+            messagebox.showerror("Login Failed", "Invalid username or password.")
+
+
+
 
     def create_widgets_buttons(self):
 
@@ -71,7 +161,50 @@ class CustomApp:
         self.CLEAR_IMAGE = ImageTk.PhotoImage(resized_CLEAR_image)
         self.CLEAR_button = Button(self.canvas, image=self.CLEAR_IMAGE, bd=0, height=25, width=56, compound='center', relief=tk.FLAT,highlightthickness=0,command=self.clear_entries)
         self.CLEAR_button.place(x=718, y=74)
+
+        #GENERATE BUTTON
+        GENERATE_IMAGE = Image.open("GENERATE.png")
+        resized_GENERATE_image = GENERATE_IMAGE.resize((100, 25), Image.LANCZOS)
+        self.GENERATE_IMAGE = ImageTk.PhotoImage(resized_GENERATE_image)
+        self.GENERATE_button = Button(self.canvas, image=self.GENERATE_IMAGE, bd=0, height=25, width=100, compound='center', relief=tk.FLAT,highlightthickness=0,command=self.GENERATE)
+        self.GENERATE_button.place(x=680, y=668)
+
         
+    def GENERATE(self):
+        try:
+            conn = mysql.connector.connect(
+                host="127.0.0.1",
+                user="root",
+                password="POGIako2003",
+                database="band"
+            )
+            cursor = conn.cursor(dictionary=True)
+
+            # Execute the SQL query to get all data
+            cursor.execute(
+                """
+                SELECT m.MemberID, m.MemberName, m.Gender, m.Department, m.UniformSize, m.Address, m.Age, i.Instrument, i.BandPosition
+                FROM members m
+                LEFT JOIN instruments i ON m.MemberID = i.MemberID
+                """
+            )
+            rows = cursor.fetchall()
+
+            conn.close()
+
+            # Create a DataFrame from the fetched data
+            df = pd.DataFrame(rows)
+
+            # Specify the Excel file path
+            excel_file_path = "members_data.xlsx"
+
+            # Write the DataFrame to an Excel file
+            df.to_excel(excel_file_path, index=False)
+
+            messagebox.showinfo("Success", f"Data exported to {excel_file_path}")
+
+        except mysql.connector.Error as e:
+            print(f"MySQL Error: {e}")
 
 
     def clear_entries(self):
@@ -151,7 +284,6 @@ class CustomApp:
         self.ADDRESS_ENTRY.place(x=440, y=332)
         self.ADDRESS_ENTRY.insert(0, default_value_ENTRIES)
         self.ADDRESS_ENTRY.bind("<FocusIn>", self.clear_default_value)
-
 
 
     def create_widgets_treeview(self):
@@ -274,6 +406,7 @@ class CustomApp:
                 focused_entry.delete(0, tk.END)
 
 
+
     def search_entry_by_id_and_name(self, event):
         search_term = self.SEARCH_ENTRY.get().strip()
         try:
@@ -350,10 +483,6 @@ class CustomApp:
         # Dynamically update the next_member_id before returning it
         self.update_next_member_id()
         return self.next_member_id
-
-
-
-
 
 
     def update_member(self, event):
@@ -494,9 +623,6 @@ class CustomApp:
                 conn.close()
 
 
-
-
-
     def delete_member(self, event):
         # Get the selected item
         selected_item = self.treeview.selection()
@@ -547,17 +673,10 @@ class CustomApp:
                 if conn:
                     conn.close()
 
-
-
-
-
-
-
-
-
-
     def run(self):
         self.master.mainloop()
+
+
 
 if __name__ == "__main__":
     root = tk.Tk()
