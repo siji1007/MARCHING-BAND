@@ -3,6 +3,7 @@ from PIL import Image, ImageTk
 from tkinter import Tk, Button,Entry,Frame,ttk, messagebox
 import mysql.connector
 import pandas as pd 
+import os
 
 class CustomApp:
     def __init__(self, master):
@@ -12,22 +13,18 @@ class CustomApp:
         self.master.geometry("800x700")
         self.master.resizable(False, False)
 
+        self.LOGIN_FORM()
+    
+    #LOGOUT FUNTION TO CALL THIS ON THE LOGOUT BUTTON, DESTORY ALL WIDGETS OF THE CURRENT DISPLAY AND DISPLAY THE LOGIN FORM
+    def logout(self):
+    # Destroy all widgets on the main dashboard
+        for widget in self.master.winfo_children():
+            widget.destroy()
 
+        # Recreate login form
         self.LOGIN_FORM()
         
-
-        '''
-        self.create_widgets_background()
-        self.create_widgets_buttons()
-        self.create_widgets_entry()
-        #self.create_widgets_frames()
-        self.create_widgets_treeview()
-
-       # Initialize next_member_id at the class level
-        self.update_next_member_id()
-        '''
-    
-
+    #DISPLAY THE LOGIN FORM 
     def LOGIN_FORM(self):
         original_image = Image.open("Dashboard_login.png")
         width, height = 800, 700
@@ -58,7 +55,7 @@ class CustomApp:
         self.LOGIN_button = Button(self.canvas, image=self.LOGIN_IMAGE, bd=0, height=23, width=152, compound='center', relief=tk.FLAT,highlightthickness=0,command=self.show)
         self.LOGIN_button.place(x=320, y=433)
 
-
+    #CLEAR THE SPECIFIC ENTRY ON LOGIN ENTRIES
     def clear_default_value_LOGIN(self, event):
         # Check the entry that currently has focus and clear it if necessary
         focused_entry = self.master.focus_get()
@@ -68,10 +65,7 @@ class CustomApp:
         elif focused_entry == self.PASSWORD_ENTRY and focused_entry.get() == "INPUT PASSWORD":
             focused_entry.delete(0, tk.END)
 
-
-
-
-
+    #SHOW THE LANDING MAIN PAGE
     def show_main_widgets(self):
         # Destroy login form widgets
         self.USERNAME_ENTRY.destroy()
@@ -88,6 +82,7 @@ class CustomApp:
         self.create_widgets_treeview()
         self.update_next_member_id()
 
+    #CHANGING THE BACKGROUND OF THE WINDOW BECAUSE THE LOGIN FORM AND MAIN PAGE ARE NOT THE SAME BACKRGROUND PNG
     def change_background(self, image_path):
         original_image = Image.open("Dashboard.png")
         width, height = 800, 700
@@ -102,13 +97,11 @@ class CustomApp:
         self.canvas.pack(fill="both", expand=True)
         self.canvas.create_image(0, 0, anchor="nw", image=self.bg_image_MAIN)
 
-
-
     def show(self):
         username = self.USERNAME_ENTRY.get()
         password = self.PASSWORD_ENTRY.get()
         
-        if username == "ADMIN" and password == "ADMIN":
+        if username == "INPUT USERNAME" and password == "INPUT PASSWORD":
             self.show_main_widgets()
 
            
@@ -118,8 +111,7 @@ class CustomApp:
             messagebox.showerror("Login Failed", "Invalid username or password.")
 
 
-
-
+    #HERE'S ALL BUTTONS
     def create_widgets_buttons(self):
 
         #SEARCH BUTTON
@@ -166,11 +158,20 @@ class CustomApp:
         GENERATE_IMAGE = Image.open("GENERATE.png")
         resized_GENERATE_image = GENERATE_IMAGE.resize((100, 25), Image.LANCZOS)
         self.GENERATE_IMAGE = ImageTk.PhotoImage(resized_GENERATE_image)
-        self.GENERATE_button = Button(self.canvas, image=self.GENERATE_IMAGE, bd=0, height=25, width=100, compound='center', relief=tk.FLAT,highlightthickness=0,command=self.GENERATE)
+        self.GENERATE_button = Button(self.canvas, image=self.GENERATE_IMAGE, bd=0, height=25, width=100, compound='center', relief=tk.FLAT,highlightthickness=0, command=lambda: self.GENERATE(selected_instrument=self.selected_instrument.get()))
         self.GENERATE_button.place(x=680, y=668)
 
-        
-    def GENERATE(self):
+
+        #LOGOUT BUTTON
+        LAGOUT_IMAGE = Image.open("LOGOUT.png")
+        resized_LAGOUT_image = LAGOUT_IMAGE.resize((80, 25), Image.LANCZOS)
+        self.LAGOUT_IMAGE = ImageTk.PhotoImage(resized_LAGOUT_image)
+        self.LAGOUT_button = Button(self.canvas, image=self.LAGOUT_IMAGE, bd=0, height=25, width=80, compound='center', relief=tk.FLAT,highlightthickness=0,command=self.logout)
+        self.LAGOUT_button.place(x=700, y=8)
+
+    
+    #FUNCTION TO GENERATE THE REPORT TO EXCEL
+    def GENERATE(self, selected_instrument=None):
         try:
             conn = mysql.connector.connect(
                 host="127.0.0.1",
@@ -180,14 +181,18 @@ class CustomApp:
             )
             cursor = conn.cursor(dictionary=True)
 
-            # Execute the SQL query to get all data
-            cursor.execute(
-                """
+            # Build the SQL query based on the selected instrument
+            sql_query = """
                 SELECT m.MemberID, m.MemberName, m.Gender, m.Department, m.UniformSize, m.Address, m.Age, i.Instrument, i.BandPosition
                 FROM members m
                 LEFT JOIN instruments i ON m.MemberID = i.MemberID
-                """
-            )
+            """
+            if selected_instrument and selected_instrument != "None":
+                sql_query += "WHERE i.Instrument = %s"
+                cursor.execute(sql_query, (selected_instrument,))
+            else:
+                cursor.execute(sql_query)
+
             rows = cursor.fetchall()
 
             conn.close()
@@ -200,6 +205,7 @@ class CustomApp:
 
             # Write the DataFrame to an Excel file
             df.to_excel(excel_file_path, index=False)
+            os.system(f"start excel {excel_file_path}")
 
             messagebox.showinfo("Success", f"Data exported to {excel_file_path}")
 
@@ -207,6 +213,7 @@ class CustomApp:
             print(f"MySQL Error: {e}")
 
 
+    #CLEAR ALL ENTRIES 
     def clear_entries(self):
         self.MEMBERNAME_ENTRY.delete(0, tk.END)
         self.AGE_ENTRY.delete(0, tk.END)
@@ -218,15 +225,15 @@ class CustomApp:
         self.ADDRESS_ENTRY.delete(0, tk.END)
 
 
+    #WIDGETS FOR ENTRIES
     def create_widgets_entry(self):
-        default_value = "Search"
+     
         
 
         self.SEARCH_ENTRY = Entry(self.canvas, width=16, font=('Arial', 14),bd=0, bg="#993333",fg="white")
         self.SEARCH_ENTRY.place(x=329, y=75)
 
     # Set default value
-        self.SEARCH_ENTRY.insert(0, default_value)
         self.SEARCH_ENTRY.bind("<FocusIn>", self.clear_default_value)
         self.SEARCH_ENTRY.bind("<KeyRelease>", lambda event: self.search_entry_by_id_and_name(event))
         
@@ -285,7 +292,18 @@ class CustomApp:
         self.ADDRESS_ENTRY.insert(0, default_value_ENTRIES)
         self.ADDRESS_ENTRY.bind("<FocusIn>", self.clear_default_value)
 
+        self.selected_instrument = tk.StringVar()
 
+        # List of instrument options
+        instrument_options = ["None", "Clarinet", "Baritone", "Saxophone Soprano", "Tuba", "Trumpet", "Bass Drum", "Quintom", "Flute", "Cymbal", "Snare", "French Horn"]
+
+        self.instrument_dropdown = ttk.Combobox(self.canvas, textvariable=self.selected_instrument, values=instrument_options, state="readonly")
+        self.instrument_dropdown.set("Filter by Instruments")
+        self.instrument_dropdown.place(x=650, y=412)
+        self.instrument_dropdown.bind("<<ComboboxSelected>>", self.filter_by_instrument)
+
+
+    #SHOW HERE THE TREEVIEW
     def create_widgets_treeview(self):
         try:
             conn = mysql.connector.connect(
@@ -364,6 +382,7 @@ class CustomApp:
             print(f"MySQL Error: {e}")
 
 
+    #BINDING THE TREEVIEW CLICK TO THE ENTRY BOXE'S
     def on_treeview_click(self, event):
         # Get the selected item
         selected_item = self.treeview.selection()
@@ -394,6 +413,7 @@ class CustomApp:
             self.INSTRUMENT_ENTRY.insert(0, item_data[7]) 
             
 
+    #CLEAR THE VALUE ON THE SPECIFIC ENTRY WHEN I CLICK IT
     def clear_default_value(self, event):
         # Clear default value when the entry is clicked
         if self.SEARCH_ENTRY.get() == "Search" and event.widget == self.SEARCH_ENTRY:
@@ -405,9 +425,27 @@ class CustomApp:
             if focused_entry.get() == "INPUT HERE":
                 focused_entry.delete(0, tk.END)
 
+    #FILTERING THE SPECIFIC OPTION ON DROPDOWN AND DISPLAY IT TO TREEVIEW REALTIME
+    def filter_by_instrument(self, event):
+      
+        selected_instrument = self.selected_instrument.get()
 
+        # Reset the filtration if "None" is selected
+        if selected_instrument == "None":
+            self.search_entry_by_id_and_name(None)
+            return
 
-    def search_entry_by_id_and_name(self, event):
+        # Add logic to filter the Treeview based on the selected instrument
+        self.search_entry_by_id_and_name(None, selected_instrument)
+
+        # Call the method to initially populate the Treeview with data based on the selected instrument
+        if selected_instrument != "Filter by Instruments":
+            self.search_entry_by_id_and_name(None, selected_instrument)
+        else:
+            self.search_entry_by_id_and_name(None)
+
+    #SEARCH REALTIME BUY ID, NAME AND SELECTED OPTION ON THE DROPDOWN
+    def search_entry_by_id_and_name(self, event, selected_instrument=None):
         search_term = self.SEARCH_ENTRY.get().strip()
         try:
             conn = mysql.connector.connect(
@@ -419,31 +457,42 @@ class CustomApp:
             cursor = conn.cursor(dictionary=True)
 
             if not search_term:
-            
-                cursor.execute(
-                    """
-                    SELECT m.MemberID, m.MemberName, m.Gender, m.Department, m.UniformSize, m.Address, m.Age, i.Instrument, i.BandPosition
-                    FROM members m
-                    LEFT JOIN instruments i ON m.MemberID = i.MemberID
-                    """
-                )
+                if selected_instrument and selected_instrument != "Filter by Instruments":
+                    # Filter by selected instrument
+                    cursor.execute(
+                        """
+                        SELECT m.MemberID, m.MemberName, m.Gender, m.Department, m.UniformSize, m.Address, m.Age, i.Instrument, i.BandPosition
+                        FROM members m
+                        LEFT JOIN instruments i ON m.MemberID = i.MemberID
+                        WHERE i.Instrument = %s
+                        """,
+                        (selected_instrument,)
+                    )
+                else:
+                    # Display all records
+                    cursor.execute(
+                        """
+                        SELECT m.MemberID, m.MemberName, m.Gender, m.Department, m.UniformSize, m.Address, m.Age, i.Instrument, i.BandPosition
+                        FROM members m
+                        LEFT JOIN instruments i ON m.MemberID = i.MemberID
+                        """
+                    )
             else:
-                # Search for entries by MemberID or MemberName
+                # Search for entries by MemberID, MemberName, or Instrument
                 cursor.execute(
                     """
                     SELECT m.MemberID, m.MemberName, m.Gender, m.Department, m.UniformSize, m.Address, m.Age, i.Instrument, i.BandPosition
                     FROM members m
                     LEFT JOIN instruments i ON m.MemberID = i.MemberID
-                    WHERE m.MemberID = %s OR m.MemberName LIKE %s
+                    WHERE m.MemberID = %s OR m.MemberName LIKE %s OR i.Instrument LIKE %s
                     """,
-                    (search_term, f'%{search_term}%')
+                    (search_term, f'%{search_term}%', f'%{search_term}%')
                 )
-
             rows = cursor.fetchall()
 
             conn.close()
 
-            max_widths = [len(col) * 10 for col in ("ID", "NAME", "GENDER", "DEPARTMENT", "UNIFORMSIZE", "ADDRESS", "AGE", "INSTRUMENTS","POSITION")]
+            max_widths = [len(col) * 10 for col in ("ID", "NAME", "GENDER", "DEPARTMENT", "UNIFORMSIZE", "ADDRESS", "AGE", "INSTRUMENTS", "POSITION")]
 
             # Clear the Treeview
             self.treeview.delete(*self.treeview.get_children())  # Use * to unpack the tuple
@@ -457,6 +506,7 @@ class CustomApp:
             print(f"MySQL Error: {e}")
 
 
+    #THE INCREMENTATION OF CURRENT MAX ID REALTIME 
     def update_next_member_id(self):
         try:
             conn = mysql.connector.connect(
@@ -479,12 +529,13 @@ class CustomApp:
         except mysql.connector.Error as e:
             print(f"MySQL Error: {e}")
 
+    #DYNAMICALLY UPDATE THE ID REALTIME
     def get_next_member_id(self):
         # Dynamically update the next_member_id before returning it
         self.update_next_member_id()
         return self.next_member_id
 
-
+    #FUNCTION FOR UPDATE BUTTON THE CONNECTION OF PYTHON AND MARIADB
     def update_member(self, event):
         # Get the selected item
         selected_item = self.treeview.selection()
@@ -552,6 +603,7 @@ class CustomApp:
                     conn.close()
 
 
+    #ADD FUNCTION TO ADD MEMBER
     def add_member(self, event):
         # Get data from entry widgets
         member_name = self.MEMBERNAME_ENTRY.get()
@@ -616,13 +668,14 @@ class CustomApp:
             self.ADDRESS_ENTRY.delete(0, tk.END)
 
         except mysql.connector.Error as e:
-            messagebox.showerror("Error", f"MySQL Error: {e}")
+            messagebox.showerror("Error", f"MySQL Error: {e}, Please fill correctly all the entry.")
 
         finally:
             if conn:
                 conn.close()
 
 
+    #DELETE FUNCTION TO DELETE MEMBER
     def delete_member(self, event):
         # Get the selected item
         selected_item = self.treeview.selection()
@@ -672,6 +725,8 @@ class CustomApp:
             finally:
                 if conn:
                     conn.close()
+
+
 
     def run(self):
         self.master.mainloop()
