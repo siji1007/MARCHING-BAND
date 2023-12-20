@@ -49,6 +49,12 @@ class CustomApp:
         self.PASSWORD_ENTRY.place(x=345, y=382)
         self.PASSWORD_ENTRY.bind("<FocusIn>", self.clear_default_value_LOGIN)
         
+        HIDE_IMAGE =Image.open('SHOW.png')
+        resize_HIDE_IMAGE = HIDE_IMAGE.resize((10,10), Image.LANCZOS)
+        self.HIDE_IMAGE = ImageTk.PhotoImage(resize_HIDE_IMAGE)
+        self.HIDE_IMAGE_BUTTON = Button(self.canvas, image= self.HIDE_IMAGE,bd=0,height= 10,width=10, compound='center', relief=tk.FLAT, highlightthickness=0)
+        self.HIDE_IMAGE_BUTTON.place(x=400, y=382)
+
 
         LOGIN_IMAGE = Image.open("LOGIN_BUTTON.png")
         resized_LOGIN_image = LOGIN_IMAGE.resize((152, 23), Image.LANCZOS)
