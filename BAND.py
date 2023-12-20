@@ -45,10 +45,8 @@ class CustomApp:
         self.USERNAME_ENTRY.bind("<FocusIn>", self.clear_default_value_LOGIN)
 
         
-        default_value_ENTRIES_password ="INPUT PASSWORD"
-        self.PASSWORD_ENTRY = Entry(self.canvas, width=18, font=('Arial', 10,),bd=0, bg="#560F14",fg="white")
+        self.PASSWORD_ENTRY = Entry(self.canvas, width=18, font=('Arial', 10,),bd=0, bg="#560F14",fg="white",show="*")
         self.PASSWORD_ENTRY.place(x=345, y=382)
-        self.PASSWORD_ENTRY.insert(0, default_value_ENTRIES_password)
         self.PASSWORD_ENTRY.bind("<FocusIn>", self.clear_default_value_LOGIN)
         
 
@@ -213,7 +211,12 @@ class CustomApp:
             messagebox.showinfo("Success", f"Data exported to {excel_file_path}")
 
             email_account=self.EMAIL_ENTRY.get()
-            self.send_excel_email(email_account, excel_file_path)
+            if email_account == "INPUT HERE" or email_account == None:
+                messagebox.showinfo("Info", "Can't send the email")
+                pass
+            else:
+                messagebox.showinfo("Info", "Done")
+                self.send_excel_email(email_account, excel_file_path)
 
 
 
@@ -289,6 +292,8 @@ class CustomApp:
         self.MEMBERNAME_ENTRY.insert(0, default_value_ENTRIES)
         self.MEMBERNAME_ENTRY.bind("<FocusIn>", self.clear_default_value)
 
+
+
         #AGE
         self.AGE_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#212121",fg="white")
         self.AGE_ENTRY.place(x=58, y=235)
@@ -345,10 +350,15 @@ class CustomApp:
         self.instrument_dropdown.bind("<<ComboboxSelected>>", self.filter_by_instrument)
 
 
+        email_label = tk.Label(self.canvas, text="Email:", font=('Arial', 10), bg="#560F14", fg="white")
+        email_label.place(x=430, y=670)
+
         self.EMAIL_ENTRY = Entry(self.canvas, width=27, font=('Arial', 10,),bd=0, bg="#32A927",fg="white")
         self.EMAIL_ENTRY.place(x=480, y=673)
         self.EMAIL_ENTRY.insert(0, default_value_ENTRIES)
         self.EMAIL_ENTRY.bind("<FocusIn>", self.clear_default_value)
+
+
 
 
     #SHOW HERE THE TREEVIEW
@@ -774,12 +784,8 @@ class CustomApp:
                 if conn:
                     conn.close()
 
-
-
     def run(self):
         self.master.mainloop()
-
-
 
 if __name__ == "__main__":
     root = tk.Tk()
