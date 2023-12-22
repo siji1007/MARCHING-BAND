@@ -62,6 +62,15 @@ class CustomApp:
         self.LOGIN_button = Button(self.canvas, image=self.LOGIN_IMAGE, bd=0, height=23, width=152, compound='center', relief=tk.FLAT,highlightthickness=0,command=self.show)
         self.LOGIN_button.place(x=320, y=433)
 
+
+        SIGNUP_IMAGE = Image.open("SIGNUP.png")
+        resized_SIGNUP_image = SIGNUP_IMAGE.resize((50, 23), Image.LANCZOS)
+        self.SIGNUP_IMAGE = ImageTk.PhotoImage(resized_SIGNUP_image)
+        self.SIGNUP_button = Button(self.canvas, image=self.SIGNUP_IMAGE, bd=0, height=23, width=50, compound='center', relief=tk.FLAT,highlightthickness=0)
+        self.SIGNUP_button.place(x=430, y=460)
+
+
+
     def toggle_password_visibility(self):
         current_show_state = self.PASSWORD_ENTRY.cget("show")
         if current_show_state:
