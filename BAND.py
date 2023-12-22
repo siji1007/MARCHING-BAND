@@ -50,10 +50,10 @@ class CustomApp:
         self.PASSWORD_ENTRY.bind("<FocusIn>", self.clear_default_value_LOGIN)
         
         HIDE_IMAGE =Image.open('SHOW.png')
-        resize_HIDE_IMAGE = HIDE_IMAGE.resize((10,10), Image.LANCZOS)
+        resize_HIDE_IMAGE = HIDE_IMAGE.resize((20,20), Image.LANCZOS)
         self.HIDE_IMAGE = ImageTk.PhotoImage(resize_HIDE_IMAGE)
-        self.HIDE_IMAGE_BUTTON = Button(self.canvas, image= self.HIDE_IMAGE,bd=0,height= 10,width=10, compound='center', relief=tk.FLAT, highlightthickness=0)
-        self.HIDE_IMAGE_BUTTON.place(x=400, y=382)
+        self.HIDE_IMAGE_BUTTON = Button(self.canvas, image= self.HIDE_IMAGE,bd=0,height= 20,width=20, compound='center', relief=tk.FLAT, highlightthickness=0, command=self.toggle_password_visibility)
+        self.HIDE_IMAGE_BUTTON.place(x=465, y=383)
 
 
         LOGIN_IMAGE = Image.open("LOGIN_BUTTON.png")
@@ -61,6 +61,15 @@ class CustomApp:
         self.LOGIN_IMAGE = ImageTk.PhotoImage(resized_LOGIN_image)
         self.LOGIN_button = Button(self.canvas, image=self.LOGIN_IMAGE, bd=0, height=23, width=152, compound='center', relief=tk.FLAT,highlightthickness=0,command=self.show)
         self.LOGIN_button.place(x=320, y=433)
+
+    def toggle_password_visibility(self):
+        current_show_state = self.PASSWORD_ENTRY.cget("show")
+        if current_show_state:
+            # Password is currently hidden, so show it
+            self.PASSWORD_ENTRY.config(show="")
+        else:
+            # Password is currently shown, so hide it
+            self.PASSWORD_ENTRY.config(show="*")
 
     #CLEAR THE SPECIFIC ENTRY ON LOGIN ENTRIES
     def clear_default_value_LOGIN(self, event):
