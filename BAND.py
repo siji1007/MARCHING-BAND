@@ -1,6 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-from tkinter import Tk, Button,Entry,Frame,ttk, messagebox
+from tkinter import Tk, Button,Entry,Frame,ttk, messagebox,Label
 import mysql.connector
 import pandas as pd 
 import os
@@ -63,11 +63,12 @@ class CustomApp:
         self.LOGIN_button.place(x=320, y=433)
 
 
+
         SIGNUP_IMAGE = Image.open("SIGNUP.png")
-        resized_SIGNUP_image = SIGNUP_IMAGE.resize((50, 23), Image.LANCZOS)
+        resized_SIGNUP_image = SIGNUP_IMAGE.resize((59, 25), Image.LANCZOS)
         self.SIGNUP_IMAGE = ImageTk.PhotoImage(resized_SIGNUP_image)
-        self.SIGNUP_button = Button(self.canvas, image=self.SIGNUP_IMAGE, bd=0, height=23, width=50, compound='center', relief=tk.FLAT,highlightthickness=0)
-        self.SIGNUP_button.place(x=430, y=460)
+        self.SIGNUP_button = Button(self.canvas, image=self.SIGNUP_IMAGE, bd=0, height=25, width=59, compound='center', relief=tk.FLAT,highlightthickness=0)
+        self.SIGNUP_button.place(x=419, y=466)
 
 
 
