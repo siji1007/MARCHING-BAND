@@ -27,7 +27,7 @@ class CustomApp:
         # Recreate login form
         self.LOGIN_FORM()
         
-    #DISPLAY THE LOGIN FORM...
+    #DISPLAY THE LOGIN FORM....
     def LOGIN_FORM(self):
         original_image = Image.open("Dashboard_login.png")
         width, height = 800, 700
